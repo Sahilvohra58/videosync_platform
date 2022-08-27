@@ -1,0 +1,23 @@
+# Service acount configs
+SERVICE_ACCOUNT_FILE_NAME: ai-video-editor-service-account.json
+
+# Speech reco configs
+SAMPLE_RATE_HERTZ: 44100
+ENABLE_AUTOMATIC_PUNCTUATION: True
+ENABLE_WORD_TIME_OFFSETS: True
+LANGUAGE_CODE: en-US
+
+# Video Configs
+BG_COLOR: white
+FONT: Georgia
+FONT_COLOR: black
+FONT_SIZE: 1
+X_POS: center
+Y_POS: dynamic
+ALIGN: South
+
+# Output configs
+OUTPUT_VIDEO_SUFFIX: _edited
+CODEC: libx264
+AUDIO_CODEC: aac
+TEMP_AUDIO_FILE: temp-audio.m4a
