@@ -51,8 +51,6 @@ class Speech_To_Text():
 
         for result in results:
             alternative = result.alternatives[0]
-            # print("Transcript: {}".format(alternative.transcript))
-            # print("Confidence: {}".format(alternative.confidence))
 
             for word_info in alternative.words:
                 word = word_info.word
@@ -152,27 +150,9 @@ class Speech_To_Text():
 
             transcript_file_path=os.path.join(temp_folder_name, self.video_file_name.split('.')[0] + "_transcript.csv")
             transcript_data.to_csv(transcript_file_path, index=False)
-
-            # print("Deleting temp files.")
-            # self.delete_temp_file(
-            #                 keep_audio_file=keep_audio_file,
-            #                 keep_transcript_file=keep_transcript_file)
-            
             
         else:
-            # possible_temp_folders = ["/temp_files", "/Additional files"]
-            # possible_file_names = ["transcript.csv", "transcript.xlsx"]
-            # transcript_possible_paths = []
-            # for folder in possible_temp_folders:
-            #     for file in possible_file_names:
-            #        transcript_possible_paths.append("/"+ folder + "/" + file)
-            # # transcript_possible_paths = [lambda x: "/"+ y + "/" + x for y in possible_temp_folders for x in possible_file_names]
-            # # transcript_possible_paths = ["/temp_files/transcript.csv", "/temp_files/transcript.excel", "/Additional files/transcript.csv", "/Additional files/transcript.excel"]
-            # for pth in transcript_possible_paths:
-            #     if os.path.exists(pth):
-            #         transcript_file_path = pth
-            #         break
-
+          
             transcript_data = pd.read_csv(transcript_file_path)
             transcript_data = transcript_data.reset_index()
         

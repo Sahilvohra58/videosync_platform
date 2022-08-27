@@ -1,12 +1,10 @@
 import argparse
 import logging
-from flask import redirect, render_template, send_file
-from multiprocessing import Process
+from flask import redirect, send_file
 import sys
 from config.config import Load_Configs
 from utils.caching import Cache
 from utils.speech_to_text import Speech_To_Text
-from utils.initiate_app import app
 from utils.produce_video import Produce_Video
 from app import app
 
@@ -55,8 +53,6 @@ che = Cache()
 s2t = Speech_To_Text()
 
 
-
-from app import app
 @app.route('/produce', methods=['GET', 'POST'])
 def produce():
     # render_template('<b>producing video</b>')
