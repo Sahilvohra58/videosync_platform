@@ -1,6 +1,6 @@
 import moviepy.editor as mp
 from config.config import Load_Configs
-from typing import Optional, Any
+from typing import Any
 import sqlite3
 import pandas as pd
 
