@@ -1,7 +1,6 @@
 import argparse
 import logging
 from flask import redirect, send_file
-import sys
 from config.config import Load_Configs
 from utils.caching import Cache
 from utils.speech_to_text import Speech_To_Text
