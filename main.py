@@ -18,7 +18,11 @@ parser.add_argument('--service_account_json', #type=str,
 
 # Optional positional argument
 parser.add_argument('--transcript_file_path', type=str,
-                    help='A boolean if you already have a transcript.')
+                    help='Path if you already have a transcript.')
+
+# Optional positional argument
+parser.add_argument('--app_port', type=str,
+                    help='Port to run the app')
 
 # Optional positional argument
 parser.add_argument('--keep_transcript_file', action='store_true',
@@ -38,6 +42,7 @@ transcript_file_path = args.transcript_file_path
 service_account_json=args.service_account_json,
 keep_audio_file=args.keep_audio_file,
 keep_transcript_file=args.keep_transcript_file
+app_port = args.app_port
 
 if args.verbose == 1:
     logging.basicConfig(level=logging.INFO)
@@ -75,7 +80,7 @@ def main():
         keep_transcript_file=args.keep_transcript_file)
 
     
-    app.run(debug=True)
+    app.run(port=app_port ,debug=True)
 
 
 if __name__ == "__main__":

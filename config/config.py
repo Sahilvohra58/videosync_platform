@@ -1,9 +1,12 @@
 import yaml
-from os.path import exists
+import os
+
+ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
+
 
 class Load_Configs:
     def __init__(self):
-        with open("./config/config.yaml", 'r') as stream:
+        with open(os.path.join(ROOT_PATH, "config.yaml", 'r')) as stream:
             cfg = yaml.safe_load(stream)
             self.SERVICE_ACCOUNT_FILE_NAME = cfg['SERVICE_ACCOUNT_FILE_NAME']
             self.SAMPLE_RATE_HERTZ = cfg['SAMPLE_RATE_HERTZ']
