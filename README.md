@@ -7,7 +7,7 @@
 ## Open demo-colab-deployment.ipynb to see the app in a sample deployment. 
 
 ### Follow these steps after opeing the demo-colab-deployment.ipynb file:
-- Runn all the cells after opening the file (shortcut ctrl+F9)
+- Run all the cells after opening the file (shortcut ctrl+F9)
 - Upload your video when it asks you to.
 - Upload service account credentials.
 - Give it a few seconds to generate subtitles.
