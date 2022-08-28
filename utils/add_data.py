@@ -8,7 +8,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///transcript.db'
 
 @app.before_first_request
 def populate_data(transcript_data: pd.DataFrame):
-    transcript_db_path = 'transcript.db'
+    transcript_db_path = './transcript.db'
     if os.path.exists(transcript_db_path):
         os.remove(transcript_db_path)
     db.create_all()

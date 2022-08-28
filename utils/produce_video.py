@@ -30,9 +30,7 @@ class Produce_Video:
     
     def _annotate(self, clip: Any, 
                 txt: str): #Xolonium-Bold', fontsize=50
-        """ Writes a text at the bottom of the clip. """
-        print(self.txt_color)
-        
+        """ Writes a text at the bottom of the clip. """        
         txtclip = mp.TextClip(txt, 
                                 font=self.font, 
                                 bg_color=self.bg_color, 
@@ -48,13 +46,11 @@ class Produce_Video:
         # print(transcript_data)
         annotated_clips = []
         for _, row in transcript_data.iterrows():
-            print(type(row['start_time']), type(row['end_time']), type(row['content']))
             annotated_clips.append(self._annotate(clip=self.my_clip.subclip(row['start_time'], row['end_time']), 
                                                    txt=str(row['content']))
                                     )
         
         final_clip = mp.concatenate_videoclips(annotated_clips)
-        # new = final_clip.set_audio(AudioFileClip("tmp_files/ML.mp3"))
         filename = self.video_file_name.split('.')[0] + cfg.OUTPUT_VIDEO_SUFFIX + ".mp4"
         final_clip.write_videofile(filename=filename, 
                                     codec=cfg.CODEC, 
