@@ -18,7 +18,11 @@ class Transcript_Data(db.Model):
 def index():
     if request.method == 'POST':
         task_content = request.form['content']
-        new_task = Transcript_Data(content=task_content)
+        start_time = request.form['Start time']
+        end_time = request.form['End time']          
+        new_task = Transcript_Data(content=task_content,
+                                    end_time=end_time,
+                                    start_time=start_time)
 
         try:
             db.session.add(new_task)
