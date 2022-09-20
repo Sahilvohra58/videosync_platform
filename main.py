@@ -49,7 +49,7 @@ if args.verbose == 1:
 else:
     logging.basicConfig(level=logging.DEBUG)
 
-if video_file_name[-4:] != ".mp4":
+if video_file_name[-4:] in [".mp4", ".MP4"]:
     raise ValueError("Only .mp4 files can be processed!!!")
 
 cfg = Load_Configs()
