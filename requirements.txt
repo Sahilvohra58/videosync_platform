@@ -5,3 +5,4 @@ flask==2.2.2
 flask_sqlalchemy==2.5.1
 argparse==1.1
 google-cloud-speech==2.15.1
+decorator==4.4.2
