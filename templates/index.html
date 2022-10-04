@@ -1,51 +1,49 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Uploads</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    
+  <div class="app">
+        <h1> AI Video Subtitle Editor</h1>
 
-{% block head %}
-<title>Transcript editor</title>
-{% endblock %}
+        <div class="form-section">
 
-{% block body %}
-<div class="content">
-    <h1 style="text-align: center">Transcript editor</h1>
-    {% if tasks|length < 1 %}
-    <h4 style="text-align: center">There is no content. Add below:</h4>
-    {% else %}
-    <table>
-        <tr>
-            <th>Text</th>
-            <th>Start time</th>
-            <th>End time</th>
-            <th>Actions</th>
-        </tr>
-        {% for task in tasks %}
-            <tr>
-                <td>{{ task.content }}</td>
-                <td>{{ task.start_time }}</td>
-                <td>{{ task.end_time }}</td>
-                <td>
-                    <a href="/delete/{{task.id}}">Delete</a>
-                    <br>
-                    <a href="/update/{{task.id}}">Update</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    {% endif %}
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <div class="form_sub_section">
+                    <h2 class="upload_text">Upload Video<h2>
+                    <h5 class="sub_upload_text"> Only .mp4 files (Required) </h4>
+                    <input type="file" name="video_file">
 
-    <div class="form">
-        <form action="/" method="POST">
-            <input type="text" name="content" id="content">
-            <input type="float" name="Start time" id="start_time">
-            <input type="float" name="End time" id="end_time">
-            <input type="submit" value="Add Task">
-        </form>
+                </div>
+
+                <div class="form_sub_section">
+                    <h2 class="upload_text">Upload Json Keys<h2>
+                    <h5 class="sub_upload_text"> (Required) </h4>
+                    <input type="file" name="json_file">
+                </div>
+
+                <div class="form_sub_section">
+                    <h2 class="upload_text">Upload Video Transcript<h2>
+                    <h5 class="sub_upload_text"> Download sample transcript format here (Optional)</h4>
+                    <input type="file" name="transcript_file">
+                </div>
+
+                <div>
+                    <input type="submit" name="submit" value="Upload">
+                </div>
+
+            </form>
+
+        </div>
+      
     </div>
-
-    <div class="form">
-        <form action="/produce" method="POST">
-            <input type="submit" value="Produce video">
-        </form>
-    </div>
-
-</div>
-{% endblock %}
+    
+  </div>
+</body>
+</html>

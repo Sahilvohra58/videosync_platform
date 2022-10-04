@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Transcript editor</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1 style="text-align: center">Transcript editor</h1>
+    {% if tasks|length < 1 %}
+    <h4 style="text-align: center">There is no content. Add below:</h4>
+    {% else %}
+    <table>
+        <tr>
+            <th>Text</th>
+            <th>Start time</th>
+            <th>End time</th>
+            <th>Actions</th>
+        </tr>
+        {% for task in tasks %}
+            <tr>
+                <td>{{ task.Content }}</td>
+                <td>{{ task.Start_Time }}</td>
+                <td>{{ task.End_Time }}</td>
+                <td>
+                    <a href="/delete/{{task.id}}">Delete</a>
+                    <br>
+                    <a href="/update/{{task.id}}">Update</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <div class="form">
+        <form action="/" method="POST">
+            <input type="text" name="Content" id="Content">
+            <input type="float" name="Start_Time" id="Start_Time">
+            <input type="float" name="End_Time" id="End_Time">
+            <input type="submit" value="Add Text">
+        </form>
+    </div>
+
+    <div class="form">
+        <form action="/produce" method="POST">
+            <input type="submit" value="Produce video">
+        </form>
+    </div>
+
+    <div class="form">
+        <form action="/get_transcript" method="POST">
+            <input type="submit" value="Download transcript">
+        </form>
+    </div>
+
+    <div class="form">
+        <form action="/get_audio_file" method="POST">
+            <input type="submit" value="Download audio file">
+        </form>
+    </div>
+
+    <div class="form">
+        <form action="/exit_app" method="POST">
+            <input type="submit" value="Exit">
+        </form>
+    </div>
+
+</div>
+{% endblock %}

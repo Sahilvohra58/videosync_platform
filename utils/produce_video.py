@@ -1,10 +1,12 @@
-import moviepy.editor as mp
-from config.config import Load_Configs
-from typing import Any
-import sqlite3
+import os
 import pandas as pd
+from typing import Any
+import moviepy.editor as mp
+import sqlite3
 
-cfg = Load_Configs()
+from config.config import LoadConfigs
+
+cfg = LoadConfigs()
 
 class Produce_Video:
     def __init__(self, video_file_name: str):
@@ -27,6 +29,9 @@ class Produce_Video:
         self.txt_color = cfg.FONT_COLOR
         self.font = cfg.FONT
         self.align = cfg.ALIGN
+        self.transcript_db_path = cfg.TRANSCRIPT_DB_PATH
+
+        self.con = sqlite3.connect( self.transcript_db_path)
     
     def _annotate(self, clip: Any, 
                 txt: str): #Xolonium-Bold', fontsize=50
@@ -41,19 +46,17 @@ class Produce_Video:
         return cvc.set_duration(clip.duration)
 
     def render_video(self):
-        con = sqlite3.connect("transcript.db")
-        transcript_data = pd.read_sql("""SELECT * FROM transcript__data""", con)
+        transcript_data = pd.read_sql("""SELECT * FROM transcript__data""", self.con)
         # print(transcript_data)
         annotated_clips = []
         for _, row in transcript_data.iterrows():
-            annotated_clips.append(self._annotate(clip=self.my_clip.subclip(row['start_time'], row['end_time']), 
-                                                   txt=str(row['content']))
+            annotated_clips.append(self._annotate(clip=self.my_clip.subclip(row['Start_Time'], row['End_Time']), 
+                                                   txt=str(row['Content']))
                                     )
         
         final_clip = mp.concatenate_videoclips(annotated_clips)
-        filename = self.video_file_name.split('.')[0] + cfg.OUTPUT_VIDEO_SUFFIX + ".mp4"
-        final_clip.write_videofile(filename=filename, 
+        filename = os.path.join(cfg.TEMP_FILES_FOLDER, "edited_video_file.mp4")
+        final_clip.write_videofile(filename=filename, fps = 24,
                                     codec=cfg.CODEC, 
-                                    audio_codec=cfg.AUDIO_CODEC, 
-                                    temp_audiofile=cfg.TEMP_AUDIO_FILE)
+                                    audio_codec=cfg.AUDIO_CODEC)
 

@@ -1,36 +1,47 @@
-from argparse import ArgumentError
+import logging
 import os
 import shutil
 from typing import Union, Optional
-from google.cloud import speech
 import moviepy.editor as mp
 import pandas as pd
-from utils.caching import Cache
-from config.config import Load_Configs
-from utils.add_data import populate_data
+from google.cloud import speech
+
+from config.config import LoadConfigs
+
+cfg = LoadConfigs()
 
 
-che = Cache()
-cfg = Load_Configs()
-
-class Speech_To_Text():
+class SpeechToText():
     def __init__(self):
-        pass
-    def connect_google_client(self, service_account_json: Union[dict, str]):
+        self.video_file_path = os.path.join(
+                cfg.UPLOAD_DIRECTORY, "video_file", "video_file.mp4")
+
+        self.service_account_path = os.path.join(
+                    cfg.UPLOAD_DIRECTORY, "service_account", "service_account.json")
+        
+       
+
+    def connect_google_client(self, service_account_json: Union[dict, str], return_speech_client=False):
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = service_account_json
         try:
             self._speech_client = speech.SpeechClient()
+            if return_speech_client:
+                return self._speech_client 
+            else:
+                return True
         except:
-            raise ConnectionAbortedError("Failed to connect to gcloud console. Check your internet connection or try again later")
-
-    def _api_request(self, audio_file_path: str, service_account_json: Union[dict, str]):
+            return False
+            #raise ConnectionAbortedError("Failed to connect to gcloud console. 
+            # Check your internet connection or try again later")
+    
+    def _api_request(self, audio_file_path: str):
         with open(audio_file_path, 'rb') as f1:
                 byte_data_mp3 = f1.read()
 
-        self.connect_google_client(service_account_json=service_account_json)
-
         audio_mp3 = speech.RecognitionAudio(content=byte_data_mp3)
 
+        self._speech_client = self.connect_google_client(self.service_account_path, return_speech_client=True)
+        
         config_mp3 = speech.RecognitionConfig(
                 sample_rate_hertz=cfg.SAMPLE_RATE_HERTZ,
                 enable_automatic_punctuation=cfg.ENABLE_AUTOMATIC_PUNCTUATION,
@@ -46,7 +57,7 @@ class Speech_To_Text():
         return response_standard_mp3.results
     
     def _process_transcript(self, results) -> pd.DataFrame:
-        transcript_data = pd.DataFrame(columns=['Words', 'Start time', 'End time'])
+        transcript_data = pd.DataFrame(columns=['Content', 'Start_Time', 'End_Time'])
         words, start_time_with_count, end_time_with_count, count = ("", 0,0,0)
 
         for result in results:
@@ -78,92 +89,84 @@ class Speech_To_Text():
 
         return transcript_data
     
-    def _check_if_transcript_exist(self):
-        transcript_file_path1 = os.path.join("./additional_files", self.video_file_name.split('.')[0] + "_transcript.csv")
-        transcript_file_path2 = os.path.join("./temp_files", self.video_file_name.split('.')[0] + "_transcript.csv")
-        if os.path.exists(transcript_file_path1):
-            return transcript_file_path1
-        elif os.path.exists(transcript_file_path2):
-            return transcript_file_path2
-        else: 
-            return None
+    def populate_data(transcript_dataframe: pd.DataFrame, Transcript_Data_Class, db):
+        transcript_db_path = './transcript.db'
+        if os.path.exists(transcript_db_path):
+            os.remove(transcript_db_path)
+        db.create_all()
+        for _, row in transcript_dataframe.iterrows():
+            append_data = Transcript_Data_Class(
+                content = row["Content"],
+                start_time = float(row["Start_Time"]),
+                end_time = float(row['End_Time']),
+            )
+            db.session.add(append_data)
+            db.session.commit()
 
+    def generate_subtitles(self, transcript_file_name: Optional[str] = None):
+        self._my_clip = mp.VideoFileClip(self.video_file_path)
+        if transcript_file_name:
+            extension = transcript_file_name.split(".")[-1]
+            if extension == "db":
+                path_old, path_new = os.path.join(
+                    cfg.UPLOAD_DIRECTORY, 
+                    "transcript_file", 
+                    f"transcript_file.{extension}"
+                ), os.path.join(
+                    f"transcript_file.{extension}"
+                )
+                shutil.copy(path_old, path_new)
+                logging.debug(f"Copied {path_old} file to {path_new}")
 
-    def delete_temp_file(self,
-                            keep_audio_file: Optional[bool] = False,
-                            keep_transcript_file: Optional[bool] = False):
+            if extension in ['csv', 'xlsx']:
+                pth = os.path.join(
+                    cfg.UPLOAD_DIRECTORY, 
+                    "transcript_file", 
+                    f"transcript_file.{extension}"
+                )
+                cols = ["Content" ,'Start_Time', 'End_Time']
 
-        shutil.rmtree('temp_files', ignore_errors=True)
-        audio_file_path = os.path.join("additional_files", self.video_file_name.split('.')[0] + "_audio.mp3")
-        transcript_file_path = os.path.join("additional_files", self.video_file_name.split('.')[0] + "_transcript.csv")
-        if not keep_audio_file:
-            if os.path.exists(audio_file_path):
-                os.remove(audio_file_path)
+                dtype= {'Content': 'str',
+                        'Start_Time': 'float',
+                        'End_Time': 'float'}
 
-        if not keep_transcript_file:
-            if os.path.exists(transcript_file_path):
-                os.remove(transcript_file_path)
-    
-
-    def generate_subtitles(self, video_file_name: str,
-                            service_account_json: Optional[Union[dict, str]] = None,
-                            transcript_file_path: Optional[str] = None,
-                            keep_audio_file: Optional[bool] = False,
-                            keep_transcript_file: Optional[bool] = False):
-
-        self._my_clip = mp.VideoFileClip(video_file_name)
-        self.video_file_name = video_file_name
-
-        if transcript_file_path == None:
-            transcript_file_path = self._check_if_transcript_exist()
-
-        if transcript_file_path == None:
-            if service_account_json is None:
-                raise ArgumentError("Service account credentials required to connect with gcloud console if transcript is not provided.")
-            duration =  self._my_clip.duration
-            duration = (duration/15 + 1 if duration%15 != 0 else duration/15)*15
-
-            if che.QUOTA + duration > 57*60:
-                err_msg = """ERROR - QUATA COULD EXCEED. Here is what u could do:
-                    1. Try using a different account and manually reset the quota limit.
-                    2. Wait until next month and try again."""
-                raise Exception(err_msg)
+                transcript = pd.read_csv(pth, usecols=cols, dtype=dtype) if extension == 'csv' else pd.read_excel(pth, usecols=cols, dtype=dtype)
+                logging.debug(f"Writing {pth} file into transcript.db")    
+        
+        else:
             
-            temp_folder_name = "temp_files"
-            if keep_audio_file or keep_transcript_file:
-                temp_folder_name = "additional_files"
-            
-            if not os.path.exists(temp_folder_name):
-                os.mkdir(temp_folder_name)
-            audio_file_path = os.path.join(temp_folder_name, self.video_file_name.split('.')[0] + "_audio.mp3")
-            self._my_clip.audio.write_audiofile(audio_file_path)
 
-            if os.stat(audio_file_path).st_size / (1024 * 1024) > 10:
+            temp_audio_file_path = os.path.join(
+                cfg.TEMP_FILES_FOLDER, 
+                 "audio.mp3")
+            os.makedirs(cfg.TEMP_FILES_FOLDER, exist_ok=True) 
+            self._my_clip.audio.write_audiofile(temp_audio_file_path)
+
+            if os.stat(temp_audio_file_path).st_size / (1024 * 1024) > 10:
                 raise Exception("Cannot process audio files more than 10 mb.")
             
-            print("Requesting API")
-            results = self._api_request(audio_file_path=audio_file_path, service_account_json=service_account_json)
-            che.update_cache(add_to_quota = duration)
-            print("Received response. Processing response")
-            transcript_data = self._process_transcript(results=results)
-            print("Data processed")
+            logging.debug("Requesting API")
+            results = self._api_request(audio_file_path=temp_audio_file_path)
 
-            transcript_file_path=os.path.join(temp_folder_name, self.video_file_name.split('.')[0] + "_transcript.csv")
-            transcript_data.to_csv(transcript_file_path, index=False)
-            
-        else:
-          
-            transcript_data = pd.read_csv(transcript_file_path)
-            transcript_data = transcript_data.reset_index()
+            logging.debug("Received response. Processing response")
+            transcript = self._process_transcript(results=results)
+            logging.debug("Data processed")
         
-        print("populating db")
-        populate_data(transcript_data=transcript_data)
+        temp_transcript_file_path = os.path.join(
+            cfg.TEMP_FILES_FOLDER, 
+            "transcript.csv")
+        transcript.to_csv(temp_transcript_file_path, index=False)
 
-        return transcript_data
-        
+        temp_audio_file_path = os.path.join(
+            cfg.TEMP_FILES_FOLDER, 
+            "audio.mp3")
+        if not os.path.exists(temp_audio_file_path):
+            self._my_clip.audio.write_audiofile(temp_audio_file_path)
 
+        return transcript
 
-        
-
-
-        
+    def delete_temp_file(self):
+        shutil.rmtree(cfg.TEMP_FILES_FOLDER, ignore_errors=True)
+        shutil.rmtree(cfg.UPLOAD_DIRECTORY, ignore_errors=True)
+        if os.path.exists('transcript.db'):
+                os.remove('transcript.db')

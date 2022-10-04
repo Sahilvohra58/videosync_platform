@@ -1,5 +1,11 @@
-# Service acount configs
-SERVICE_ACCOUNT_FILE_NAME: ai-video-editor-service-account.json
+# General configs
+UPLOAD_DIRECTORY: 'uploads/'
+ALLOWED_VIDEO_EXTENSIONS : ['mp4', 'MP4']
+ALLOWED_JSON_EXTENSIONS : ['json']
+ALLOWED_TRANSCRIPT_EXTENSIONS : ['csv', 'xlsx', 'db']
+DB_DIRECTORY : 'db/'
+TEMP_FILES_FOLDER: 'temp_files'
+TRANSCRIPT_DB_PATH: 'transcript.db'
 
 # Speech reco configs
 SAMPLE_RATE_HERTZ: 44100
@@ -17,7 +23,5 @@ Y_POS: dynamic
 ALIGN: South
 
 # Output configs
-OUTPUT_VIDEO_SUFFIX: _edited
 CODEC: libx264
 AUDIO_CODEC: aac
-TEMP_AUDIO_FILE: temp-audio.m4a
