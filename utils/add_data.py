@@ -1,7 +1,10 @@
-import pandas as pd
 import os
+import logging
+import pandas as pd
+
 
 def populate_data(transcript_dataframe: pd.DataFrame, Transcript_Data_Class, db):
+    logging.debug("Populating transcript.db")
     transcript_db_path = './transcript.db'
     if os.path.exists(transcript_db_path):
         os.remove(transcript_db_path)
@@ -14,3 +17,4 @@ def populate_data(transcript_dataframe: pd.DataFrame, Transcript_Data_Class, db)
         )
         db.session.add(append_data)
         db.session.commit()
+    logging.debug("Populating transcript.db successful")
