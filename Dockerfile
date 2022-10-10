@@ -1,7 +1,7 @@
 FROM python:3.8
 
+COPY . /app
 WORKDIR /app
-COPY . .
 
 RUN bash apt_requirements.sh
 RUN pip install --upgrade -r requirements.txt
