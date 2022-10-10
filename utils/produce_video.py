@@ -1,4 +1,5 @@
 import os
+import logging
 import pandas as pd
 from typing import Any
 import moviepy.editor as mp
@@ -46,6 +47,7 @@ class Produce_Video:
         return cvc.set_duration(clip.duration)
 
     def render_video(self):
+        logging.debug("Rendering video...")
         transcript_data = pd.read_sql("""SELECT * FROM transcript__data""", self.con)
         # print(transcript_data)
         annotated_clips = []
@@ -56,6 +58,7 @@ class Produce_Video:
         
         final_clip = mp.concatenate_videoclips(annotated_clips)
         filename = os.path.join(cfg.TEMP_FILES_FOLDER, "edited_video_file.mp4")
+        logging.debug(f"Writing video at {filename}")
         final_clip.write_videofile(filename=filename, fps = 24,
                                     codec=cfg.CODEC, 
                                     audio_codec=cfg.AUDIO_CODEC)
