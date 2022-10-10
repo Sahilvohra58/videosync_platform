@@ -1,0 +1,8 @@
+services:
+  subtitle-app:
+    build:
+      context: ./
+      args:
+        IMAGEIO_FFMPEG_EXE: "/usr/bin/ffmpeg"
+    ports:
+      - 5000:5000
