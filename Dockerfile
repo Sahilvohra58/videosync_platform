@@ -9,6 +9,5 @@ RUN sed -i '/<policy domain="path" rights="none" pattern="@\*"/d' /etc/ImageMagi
 RUN pip uninstall --yes moviepy decorator
 RUN pip install moviepy==1.0.3
 
-ENTRYPOINT ["python"]
 EXPOSE $PORT
 CMD gunicorn --workers=2 --bind 0.0.0.0:$PORT app:app
