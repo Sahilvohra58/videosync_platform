@@ -4,4 +4,5 @@ Moviepy==1.0.3
 flask==2.2.2
 flask_sqlalchemy==2.5.1
 argparse==1.1
+gunicorn==20.1.0
 google-cloud-speech==2.16.0
