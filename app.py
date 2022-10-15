@@ -10,7 +10,6 @@ from utils.produce_video import Produce_Video
 
 from config.config import LoadConfigs
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///transcript.db'
 app.config['SECRET_KEY'] = 'supersecretkey'
