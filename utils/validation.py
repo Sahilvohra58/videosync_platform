@@ -107,6 +107,5 @@ class Validation():
 
         else:
             return "Either service account or transcript file required."
-        # To Do - Validate the start time and end time range of transcript vs video
             
         return redirect('/update_subtitles')
