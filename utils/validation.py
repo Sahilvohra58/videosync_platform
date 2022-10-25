@@ -49,8 +49,8 @@ class Validation():
             extension = video_file_name.split(".")[-1]  # os.path.splittext(video_file.filename)
 
             if extension not in cfg.ALLOWED_VIDEO_EXTENSIONS:
-                logging.error(f"Cannot process file other than .mp4 extension")
-                return "Only .mp4 files allowed."
+                logging.error(f"Cannot process file other than .mp4 extension - found {extension}")
+                return f"Only .mp4 files allowed - found {extension}"
 
             pth = os.path.join(
                 cfg.UPLOAD_DIRECTORY, "video_file", "video_file.mp4"
