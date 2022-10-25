@@ -162,7 +162,8 @@ def produce():
     logging.debug(f"Producing video")
     Produce_Video(video_file_name=video_file_path).render_video()
     logging.debug(f"Downloading video")
-    return send_file(video_file_path, as_attachment=True)
+    filename = os.path.join(cfg.TEMP_FILES_FOLDER, "edited_video_file.mp4")
+    return send_file(filename, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
